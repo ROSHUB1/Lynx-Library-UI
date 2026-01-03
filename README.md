@@ -1,12 +1,14 @@
 # Lynx-Library-UI (improved)
 
-Improved UI library for Roblox with a compatibility adapter that provides Section(...) API so older scripts can work with minimal changes.
+This repository contains an improved UI library for Roblox plus a compatibility adapter that provides a Section API similar to older versions.
 
-Files added:
-- src/ui_library.lua  (improved library)
-- src/adapter.lua     (compatibility adapter for Sections)
-- examples/test_example.lua (example usage and test)
+What's new in this update:
+- Element handles returned from element creators (Toggle, Button, Label, Slider, Keybind, InputBox, Dropdown) with Set/Get methods.
+- Adapter now returns element handles when creating elements inside Sections.
+- Adapter supports two-column layout: use `Side = "Right"` for sections on the right column.
+- DropdownFunctions include `Refresh` and `GetSelected`.
 
 Usage:
-- Option A (local ModuleScripts): place `ui_library` and `adapter` ModuleScripts in ReplicatedStorage and require them.
-- Option B (HTTP): load `src/ui_library.lua` from raw.githubusercontent and optionally use Adapter as a ModuleScript.
+1. Put `src/ui_library.lua` as a ModuleScript (or load it via raw URL).
+2. Put `src/adapter.lua` as a ModuleScript and require it to use the Section API.
+3. Example: see `examples/test_example.lua`.
