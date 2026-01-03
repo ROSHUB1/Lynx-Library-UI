@@ -1,0 +1,231 @@
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+if CoreGui:FindFirstChild("RayzHub") then
+    CoreGui.RayzHub:Destroy()
+end
+
+local library = { Flags = {} }
+
+-- DRAG
+local function MakeDraggable(gui)
+    local dragging, dragInput, dragStart, startPos
+    gui.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = gui.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
+            end)
+        end
+    end)
+    gui.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            gui.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
+
+function library:Window(Info)
+    Info.Text = Info.Text or "Rayz Hub"
+    local window = {}
+
+    -- GUI
+    local mainGui = Instance.new("ScreenGui", CoreGui)
+    mainGui.Name = "RayzHub"
+
+    local Main = Instance.new("Frame", mainGui)
+    Main.Size = UDim2.new(0, 620, 0, 380)
+    Main.Position = UDim2.new(0.5, -310, 0.5, -190)
+    Main.BackgroundColor3 = Color3.fromRGB(22,22,22)
+    Main.BorderSizePixel = 0
+    Main.ClipsDescendants = true
+    MakeDraggable(Main)
+
+    local MC = Instance.new("UICorner", Main)
+    MC.CornerRadius = UDim.new(0,12)
+
+    local Stroke = Instance.new("UIStroke", Main)
+    Stroke.Color = Color3.fromRGB(60,60,60)
+
+    local Grad = Instance.new("UIGradient", Main)
+    Grad.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(26,26,26)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(18,18,18))
+    }
+
+    -- TOPBAR
+    local Topbar = Instance.new("Frame", Main)
+    Topbar.Size = UDim2.new(1,0,0,38)
+    Topbar.BackgroundColor3 = Color3.fromRGB(18,18,18)
+    Topbar.BorderSizePixel = 0
+
+    local TopText = Instance.new("TextLabel", Topbar)
+    TopText.Size = UDim2.new(1,0,1,0)
+    TopText.BackgroundTransparency = 1
+    TopText.Text = "  "..Info.Text
+    TopText.Font = Enum.Font.GothamSemibold
+    TopText.TextSize = 14
+    TopText.TextXAlignment = Left
+    TopText.TextColor3 = Color3.fromRGB(230,230,230)
+
+    -- SIDEBAR
+    local Sidebar = Instance.new("Frame", Main)
+    Sidebar.Size = UDim2.new(0,150,1,-38)
+    Sidebar.Position = UDim2.new(0,0,0,38)
+    Sidebar.BackgroundColor3 = Color3.fromRGB(20,20,20)
+    Sidebar.BorderSizePixel = 0
+
+    local SideInner = Instance.new("Frame", Sidebar)
+    SideInner.Size = UDim2.new(1,-8,1,-8)
+    SideInner.Position = UDim2.new(0,4,0,4)
+    SideInner.BackgroundColor3 = Color3.fromRGB(28,28,28)
+    SideInner.BorderSizePixel = 0
+
+    local SIC = Instance.new("UICorner", SideInner)
+    SIC.CornerRadius = UDim.new(0,10)
+
+    -- HEADER (LOGO + NAME)
+    local Header = Instance.new("Frame", SideInner)
+    Header.Size = UDim2.new(1,0,0,60)
+    Header.BackgroundTransparency = 1
+
+    local LogoHolder = Instance.new("Frame", Header)
+    LogoHolder.Size = UDim2.new(0,36,0,36)
+    LogoHolder.Position = UDim2.new(0,12,0.5,-18)
+    LogoHolder.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    LogoHolder.BorderSizePixel = 0
+
+    local LHC = Instance.new("UICorner", LogoHolder)
+    LHC.CornerRadius = UDim.new(1,0)
+
+    local Logo = Instance.new("ImageLabel", LogoHolder)
+    Logo.Size = UDim2.new(1,-6,1,-6)
+    Logo.Position = UDim2.new(0,3,0,3)
+    Logo.BackgroundTransparency = 1
+    Logo.Image = "rbxassetid://134588150181664"
+    Logo.ScaleType = Enum.ScaleType.Fit
+
+    local LC = Instance.new("UICorner", Logo)
+    LC.CornerRadius = UDim.new(1,0)
+
+    local Glow = Instance.new("UIStroke", LogoHolder)
+    Glow.Color = Color3.fromRGB(120,120,120)
+    Glow.Transparency = 0.4
+
+    -- glow pulse
+    task.spawn(function()
+        while LogoHolder.Parent do
+            TweenService:Create(Glow, TweenInfo.new(1.2), {Transparency = 0.15}):Play()
+            task.wait(1.2)
+            TweenService:Create(Glow, TweenInfo.new(1.2), {Transparency = 0.45}):Play()
+            task.wait(1.2)
+        end
+    end)
+
+    local HubName = Instance.new("TextLabel", Header)
+    HubName.Position = UDim2.new(0,56,0,0)
+    HubName.Size = UDim2.new(1,-60,1,0)
+    HubName.BackgroundTransparency = 1
+    HubName.Text = Info.Text
+    HubName.Font = Enum.Font.GothamSemibold
+    HubName.TextSize = 14
+    HubName.TextXAlignment = Left
+    HubName.TextColor3 = Color3.fromRGB(235,235,235)
+
+    -- TAB LIST
+    local TabScroll = Instance.new("ScrollingFrame", SideInner)
+    TabScroll.Position = UDim2.new(0,0,0,65)
+    TabScroll.Size = UDim2.new(1,0,1,-70)
+    TabScroll.ScrollBarThickness = 0
+    TabScroll.BackgroundTransparency = 1
+
+    local TL = Instance.new("UIListLayout", TabScroll)
+    TL.Padding = UDim.new(0,6)
+    TL.HorizontalAlignment = Center
+
+    -- CONTENT
+    local Content = Instance.new("Frame", Main)
+    Content.Position = UDim2.new(0,155,0,48)
+    Content.Size = UDim2.new(1,-165,1,-58)
+    Content.BackgroundTransparency = 1
+
+    function window:Tab(Name)
+        local Btn = Instance.new("TextButton", TabScroll)
+        Btn.Size = UDim2.new(1,-10,0,34)
+        Btn.BackgroundColor3 = Color3.fromRGB(34,34,34)
+        Btn.Text = "   "..Name
+        Btn.Font = Enum.Font.Gotham
+        Btn.TextSize = 13
+        Btn.TextXAlignment = Left
+        Btn.TextColor3 = Color3.fromRGB(180,180,180)
+        Btn.BorderSizePixel = 0
+
+        local BC = Instance.new("UICorner", Btn)
+        BC.CornerRadius = UDim.new(0,8)
+
+        local Container = Instance.new("ScrollingFrame", Content)
+        Container.Size = UDim2.new(1,0,1,0)
+        Container.Visible = false
+        Container.BackgroundTransparency = 1
+        Container.ScrollBarThickness = 2
+
+        local CL = Instance.new("UIListLayout", Container)
+        CL.Padding = UDim.new(0,8)
+
+        Btn.MouseButton1Click:Connect(function()
+            for _,v in pairs(Content:GetChildren()) do
+                if v:IsA("ScrollingFrame") then v.Visible = false end
+            end
+            for _,v in pairs(TabScroll:GetChildren()) do
+                if v:IsA("TextButton") then
+                    TweenService:Create(v,TweenInfo.new(0.15),{
+                        BackgroundColor3 = Color3.fromRGB(34,34,34),
+                        TextColor3 = Color3.fromRGB(180,180,180)
+                    }):Play()
+                end
+            end
+            Container.Visible = true
+            TweenService:Create(Btn,TweenInfo.new(0.15),{
+                BackgroundColor3 = Color3.fromRGB(45,45,45),
+                TextColor3 = Color3.fromRGB(255,255,255)
+            }):Play()
+        end)
+
+        local tab = {}
+
+        function tab:Button(Text, Callback)
+            local B = Instance.new("TextButton", Container)
+            B.Size = UDim2.new(1,-10,0,36)
+            B.BackgroundColor3 = Color3.fromRGB(40,40,40)
+            B.Text = Text
+            B.Font = Enum.Font.GothamMedium
+            B.TextSize = 13
+            B.TextColor3 = Color3.fromRGB(255,255,255)
+
+            local C = Instance.new("UICorner", B)
+            C.CornerRadius = UDim.new(0,8)
+
+            B.MouseButton1Click:Connect(Callback)
+        end
+
+        return tab
+    end
+
+    return window
+end
+
+return library
